@@ -7,6 +7,10 @@
  */
 window.planeFactory = new Object();
 (function(w){
+    /**
+     * 飞机的对象，用此对象进行飞机的创建
+     * @since 2019.10.09
+     * */
     var plane = function(scene){
         this.scene = scene;
         this.body =new THREE.Group();
@@ -34,6 +38,10 @@ window.planeFactory = new Object();
         this.depth = 0.4;
     };
 
+    /**
+     * 飞机机翼的上边机翼
+     * @since2019.10.09
+     * */
     var wing_front_top = function(){
         this.body = null;
         this.bodyShape = new THREE.Shape();
@@ -97,6 +105,10 @@ window.planeFactory = new Object();
     };
     w.wing_front_top = wing_front_top;
 
+    /**
+     * 飞机机翼的下边机翼
+     * @since2019.10.09
+     * */
     var wing_front_bottom = function(){
         this.body = null;
         this.bodyShape = new THREE.Shape();
@@ -149,6 +161,10 @@ window.planeFactory = new Object();
     };
     w.wing_front_bottom = wing_front_top;
 
+    /**
+     * 飞机的主体部分
+     * @since 2019.10.09
+     * */
     var plane_body = function(){
         this.body = null;
 
@@ -157,7 +173,7 @@ window.planeFactory = new Object();
         this.height = 12;
         this.radialSegments = 12;
         this.heightSegments = 10;
-        this.openEnded = false;
+        this.openEnded = true;
         this.thetaStart = 0;
         this.thetaLength = 2 * Math.PI;
 
@@ -169,8 +185,8 @@ window.planeFactory = new Object();
     };
     plane_body.prototype = {
         init : function(){
-            var height_center = 6,
-                height_front = 1.2;
+            var height_center = 4.5,
+                height_front = this.radiusTop;
             this.bodyGeometry = new THREE.CylinderGeometry(
                 this.radiusTop,
                 this.radiusBottom,
@@ -181,10 +197,9 @@ window.planeFactory = new Object();
                 this.thetaStart,
                 this.thetaLength
             );
-
-
-            var frontBodyGeometry = buildFrontBodyOfPlane(height_front);
-            frontBodyGeometry.translate(0,-1 * ( height_center  + height_front ) / 2 ,0);
+            //进行图形的合并
+            var frontBodyGeometry = buildFrontBodyOfPlane(height_front,this.radialSegments);
+            frontBodyGeometry.translate(0,height_center / 2 ,0);
             this.bodyGeometry.merge(frontBodyGeometry);
 
             this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
@@ -197,10 +212,10 @@ window.planeFactory = new Object();
         },
         setSite : function(){
             var wing = new wing_front();
-            this.bodyGeometry.rotateX(-1 * Math.PI / 2);
+            this.bodyGeometry.rotateX(1 * Math.PI / 2);
             this.bodyGeometry.rotateY(0);
             this.bodyGeometry.rotateZ(0);
-            this.bodyGeometry.translate(wing.width / 2,this.radiusTop - wing.depth,1.5);
+            this.bodyGeometry.translate(wing.width / 2,this.radiusTop - wing.depth,2);
         },
         build : function(){
             return this.body;
@@ -208,29 +223,26 @@ window.planeFactory = new Object();
     };
     w.plane_body = plane_body;
 
-    function buildFrontBodyOfPlane(height_front){
-        var front_angel =  Math.PI / 3;
-        var front_shape = new THREE.Shape();
-        front_shape.moveTo(0 , 0);
-        front_shape.lineTo(0 , height_front);
-        front_shape.absarc( 0, 0 , height_front, Math.PI / 2,  Math.PI / 2 - front_angel , true );
-        front_shape.lineTo(height_front * Math.cos(Math.PI / 2 - front_angel),0);
-        front_shape.lineTo(0 , 0);
-
-        var curve = new THREE.CatmullRomCurve3(
-            new THREE.Vector2( -10, 0 ),
-            new THREE.Vector2( -5, 15 ),
-            new THREE.Vector2( 20, 15 ),
-            new THREE.Vector2( 10, 0 )
-        );
-
-        var extrudeSettings = {
-            bevelEnabled: false,
-            steps: 6,
-            extrudePath : curve
-        };
-
-        var geometry = new THREE.ExtrudeGeometry( front_shape, extrudeSettings );
+    /**
+     *飞机的本体的前端部分
+     *@since 2019.10.09
+     * */
+    function buildFrontBodyOfPlane(height_front,radialSegments){
+        var points = [];
+        var changeAngleRate = Math.PI / 16,//变化的角度数
+            changeAngleTimes = 3;//角度数变化的次数
+        //points.push( new THREE.Vector3(0 , 0 ,0));
+        points.push( new THREE.Vector3(height_front, 0, 0));
+        //0°到45°
+        for ( var i = 1; i <= changeAngleTimes; i ++ ) {
+            var y = height_front * Math.sin(changeAngleRate * i),
+                x = height_front * Math.cos(changeAngleRate * i );
+            points.push( new THREE.Vector3(x , y  ,0));
+        }
+        points.push( new THREE.Vector3( height_front * Math.sin(   changeAngleRate *  changeAngleTimes) - 0.1,height_front * Math.sin(   changeAngleRate *  changeAngleTimes) - 0.2,0));
+        points.push( new THREE.Vector3( 0,height_front * Math.sin(   changeAngleRate *  changeAngleTimes) - 0.2,0));
+        points.push( new THREE.Vector3( 0 , 0 , 0));
+        var geometry = new THREE.LatheGeometry( points,radialSegments,0,2 * Math.PI);
         return geometry;
-    }
+    };
 })(planeFactory);
