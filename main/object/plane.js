@@ -173,7 +173,6 @@ window.planeFactory = new Object();
         this.height = 12;
         this.radialSegments = 12;
         this.heightSegments = 10;
-        this.openEnded = true;
         this.thetaStart = 0;
         this.thetaLength = 2 * Math.PI;
 
@@ -186,28 +185,38 @@ window.planeFactory = new Object();
     plane_body.prototype = {
         init : function(){
             var height_center = 4.5,
-                height_front = this.radiusTop;
-            this.bodyGeometry = new THREE.CylinderGeometry(
+                height_front = this.radiusTop,
+                height_back = 9;
+            //飞机身体的中间部分
+            var centerBofyOfPlane = new THREE.CylinderBufferGeometry(
                 this.radiusTop,
                 this.radiusBottom,
                 height_center,
                 this.radialSegments,
                 1,
-                this.openEnded,
+                true,
                 this.thetaStart,
                 this.thetaLength
             );
-            //进行图形的合并
+            //飞机身体的前边部分
             var frontBodyGeometry = buildFrontBodyOfPlane(height_front,this.radialSegments);
             frontBodyGeometry.translate(0,height_center / 2 ,0);
-            this.bodyGeometry.merge(frontBodyGeometry);
+
+            //飞机身体的后边部分
+            var backBodyOfPlane = buildBackBodyOfPlane(height_back,this.radiusTop,this.radialSegments);
+            //backBodyOfPlane.translate(0, -1 * (height_back + height_center ) / 2,0);
+
+            //图形合并
+            //var geometries = [frontBodyGeometry,centerBofyOfPlane,backBodyOfPlane];
+            var geometries = [backBodyOfPlane];
+            this.bodyGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries,false);
 
             this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
                 wireframe : true,
             } );
-            this.setSite();
+            //this.setSite();
             this.body = new THREE.Mesh( this.bodyGeometry, this.bodyMaterial ) ;
         },
         setSite : function(){
@@ -242,7 +251,42 @@ window.planeFactory = new Object();
         points.push( new THREE.Vector3( height_front * Math.sin(   changeAngleRate *  changeAngleTimes) - 0.1,height_front * Math.sin(   changeAngleRate *  changeAngleTimes) - 0.2,0));
         points.push( new THREE.Vector3( 0,height_front * Math.sin(   changeAngleRate *  changeAngleTimes) - 0.2,0));
         points.push( new THREE.Vector3( 0 , 0 , 0));
-        var geometry = new THREE.LatheGeometry( points,radialSegments,0,2 * Math.PI);
+        var geometry = new THREE.LatheBufferGeometry( points,radialSegments,0,2 * Math.PI);
         return geometry;
     };
+
+    /**
+     *飞机的本体的后端部分
+     *@since 2019.10.13
+     * */
+    function buildBackBodyOfPlane(height_back,radiusTop,radialSegments){
+        var heightSegments = 1,//高度的分段数
+            radiusBottom = 0.2;//底部圆的半径
+        var moveDistince = (radiusTop - radiusBottom) / 2,
+            max_y = height_back / 2 - 0.01;
+        var backBodyOfPlane = new THREE.CylinderBufferGeometry(
+            radiusTop,
+            radiusBottom,
+            height_back,
+            radialSegments,
+            heightSegments,
+            false,
+            0,
+            Math.PI * 2
+        );
+        var vertex = new THREE.Vector3();
+        var backBodyOfPlane_Position = backBodyOfPlane.attributes.position;
+        var positionArray = new Array();
+        for(i = 0;i<backBodyOfPlane_Position.count;i++){
+            vertex.fromBufferAttribute( backBodyOfPlane_Position, i );
+            if(vertex.y < 0){
+                vertex.z -= radiusTop / 2;
+            }
+            positionArray.push(vertex.x);
+            positionArray.push(vertex.y);
+            positionArray.push(vertex.z);
+        }
+        backBodyOfPlane.attributes.position.array = new Float32Array(positionArray);
+        return backBodyOfPlane;
+    }
 })(planeFactory);
