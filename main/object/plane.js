@@ -31,6 +31,9 @@ window.planeFactory = new Object();
             const plane_body_mesh = new plane_body();
             this.body.add(plane_body_mesh.build());
 
+            const wing_back_mesh = new wing_back();
+            this.body.add(wing_back_mesh.build());
+
             this.scene.add(this.body);
         }
     };
@@ -242,6 +245,7 @@ window.planeFactory = new Object();
         }
     };
     w.wing_upholder = wing_upholder;
+
     /**
      * 飞机的主体部分
      * @since 2019.10.09
@@ -370,4 +374,86 @@ window.planeFactory = new Object();
         backBodyOfPlane.attributes.position.array = new Float32Array(positionArray);
         return backBodyOfPlane;
     }
+
+    /**
+     * 后端的尾翼
+     * @since 2019.10.20
+     * */
+    let wing_back = function(){
+        this.body = null;
+        this.bodyGeometry = null;
+
+        this.singleWingRadius = 1.5;
+        this.bodyShape = new THREE.Shape();
+
+        this.bodyMaterial = null;
+        this.extrudeSettings = null;
+
+        this.materialColor = 0x00ff00;
+
+        this.init();
+    };
+    wing_back.prototype = {
+        init : function(){
+            //挤出的设置
+            this.extrudeSettings = {
+                depth: 0.2,
+                bevelEnabled: false,
+                bevelSegments: 2,
+                steps: 1,
+                bevelSize: 0,
+                bevelThickness: 1,
+                bevelOffset: 0
+            };
+            //材质
+            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+                color: this.materialColor,
+                side : THREE.FrontSide,
+                wireframe : true,
+            } );
+
+            this.bodyShape.moveTo(0,0);
+            this.bodyShape.absarc(
+                -1 * this.singleWingRadius,
+                0,
+                this.singleWingRadius,
+                Math.PI,
+                0,
+                true
+            );
+            this.bodyShape.absarc(
+                this.singleWingRadius,
+                0,
+                this.singleWingRadius,
+                Math.PI,
+                0,
+                true
+            );
+            this.bodyShape.bezierCurveTo(
+                this.singleWingRadius * 2 , -0.1,
+                this.singleWingRadius * 2 - 0.1 , -0.2,
+                this.singleWingRadius * 2 - 0.2 , -0.3
+            );
+            this.bodyShape.lineTo( -1 * this.singleWingRadius * 2 + 0.2,-0.3);
+            this.bodyShape.bezierCurveTo(
+                -1 * this.singleWingRadius * 2 + 0.2 , -0.3,
+                -1 * this.singleWingRadius * 2 + 0.1 , -0.2,
+                -1 * this.singleWingRadius * 2 , -0.1,
+            );
+            this.bodyGeometry = new THREE.ExtrudeBufferGeometry( this.bodyShape, this.extrudeSettings );
+
+            this.setSite();
+
+            this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
+        },
+        setSite : function(){
+            this.bodyGeometry.rotateX(-1 * Math.PI / 2);
+            this.bodyGeometry.rotateY(0);
+            this.bodyGeometry.rotateZ(0);
+        },
+        build : function(){
+            return this.body;
+        }
+    };
+    w.wing_back = wing_back
 })(planeFactory);
