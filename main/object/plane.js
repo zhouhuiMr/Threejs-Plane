@@ -450,6 +450,12 @@ window.planeFactory = new Object();
             this.bodyGeometry.rotateX(-1 * Math.PI / 2);
             this.bodyGeometry.rotateY(0);
             this.bodyGeometry.rotateZ(0);
+            const wing_front_object = new wing_front();
+            this.bodyGeometry.translate(
+                (wing_front_object.width + wing_front_object.height / 2 - this.singleWingRadius - 0.5) / 2,
+                2.9,
+                -9.2
+            );
         },
         build : function(){
             return this.body;
