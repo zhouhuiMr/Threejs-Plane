@@ -34,6 +34,9 @@ window.planeFactory = new Object();
             const wing_back_mesh = new wing_back();
             this.body.add(wing_back_mesh.build());
 
+            const empennage_mesh = new empennage();
+            this.body.add(empennage_mesh.build());
+
             this.scene.add(this.body);
         }
     };
@@ -454,12 +457,78 @@ window.planeFactory = new Object();
             this.bodyGeometry.translate(
                 (wing_front_object.width + wing_front_object.height / 2 - this.singleWingRadius - 0.5) / 2,
                 2.9,
-                -9.2
+                -8.5
             );
         },
         build : function(){
             return this.body;
         }
     };
-    w.wing_back = wing_back
+    w.wing_back = wing_back;
+
+    /**
+     * 后端的垂直尾翼
+     * @since 2019.10.27
+     * */
+    let empennage = function(){
+        this.body = null;
+        this.bodyGeometry = null;
+
+        this.singleWingRadius = 1.5;
+        this.bodyShape = new THREE.Shape();
+
+        this.bodyMaterial = null;
+        this.extrudeSettings = null;
+
+        this.materialColor = 0x00ff00;
+
+        this.init();
+    };
+    empennage.prototype = {
+        init : function(){
+            //挤出的设置
+            this.extrudeSettings = {
+                depth: 0.2,
+                bevelEnabled: false,
+                bevelSegments: 2,
+                steps: 1,
+                bevelSize: 0,
+                bevelThickness: 1,
+                bevelOffset: 0
+            };
+            //材质
+            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+                color: this.materialColor,
+                side : THREE.FrontSide,
+                wireframe : true,
+            } );
+            this.bodyShape.moveTo(0,0);
+            this.bodyShape.lineTo(3,2.5);
+            this.bodyShape.bezierCurveTo(
+                3,2.5,
+                3.5,3,
+                3.7,2
+            );
+            this.bodyShape.lineTo(3.2,0);
+            this.bodyShape.lineTo(0,0);
+            this.bodyGeometry = new THREE.ExtrudeBufferGeometry( this.bodyShape, this.extrudeSettings );
+            this.setSite();
+            this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
+        },
+        setSite : function(){
+            this.bodyGeometry.rotateX(0);
+            this.bodyGeometry.rotateY(Math.PI / 2);
+            this.bodyGeometry.rotateZ(0);
+            const wing_front_object = new wing_front();
+            this.bodyGeometry.translate(
+                (wing_front_object.width + wing_front_object.height / 2 - this.singleWingRadius - 0.5) / 2,
+                2.9,
+                -6.5
+            );
+        },
+        build : function(){
+            return this.body;
+        }
+    };
+    w.empennage = empennage;
 })(planeFactory);
