@@ -40,6 +40,9 @@ window.planeFactory = new Object();
             const propeller_mesh = new propeller();
             this.body.add(propeller_mesh.build());
 
+            const propellerUpholder_mesh = new propellerUpholder();
+            this.body.add(propellerUpholder_mesh.build());
+
             this.scene.add(this.body);
         }
     };
@@ -297,8 +300,6 @@ window.planeFactory = new Object();
             const backBodyOfPlane = buildBackBodyOfPlane(height_back,this.radiusTop,this.radialSegments);
             backBodyOfPlane.translate(0, -1 * (height_back + height_center ) / 2,0);
 
-            //飞机螺旋桨的支撑物
-            const propellerUpholder = buildPropellerUpholder();
             //图形合并
             const geometries = [frontBodyGeometry,centerBofyOfPlane,backBodyOfPlane];
             //var geometries = [backBodyOfPlane];
@@ -615,4 +616,55 @@ window.planeFactory = new Object();
         }
     };
     window.propeller = propeller;
+
+
+    let propellerUpholder = function(){
+        this.body = null;
+        this.bodyGeometry = null;
+
+        this.bodyMaterial = null;
+
+        this.materialColor = 0x00ff00;
+
+        this.points = [];
+
+        this.init();
+    };
+    propellerUpholder.prototype = {
+        init : function(){
+            //材质
+            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+                color: this.materialColor,
+                side : THREE.FrontSide,
+                wireframe : true,
+            } );
+
+            this.points.push( new THREE.Vector3(0, 0.4, 0));
+            //0°到45°
+            for ( let i = 2; i < 6; i ++ ) {
+                let y = i * 0.3,
+                    x = Math.sin( i * 0.2 );
+                this.points.push( new THREE.Vector3(x , y  ,0));
+            }
+            this.bodyGeometry = new THREE.LatheBufferGeometry( this.points,8,0,2 * Math.PI);
+            this.setSite();
+            this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
+        },
+        setSite : function(){
+            this.bodyGeometry.rotateX(-1 * Math.PI / 2);
+            this.bodyGeometry.rotateY(0);
+            this.bodyGeometry.rotateZ(0);
+            const wing_front_object = new wing_front();
+            const plane_body_object = new plane_body();
+            this.bodyGeometry.translate(
+                wing_front_object.width /2 ,
+                plane_body_object.radiusTop - 0.3,
+                plane_body_object.height / 2 + 0.3
+            );
+        },
+        build : function(){
+            return this.body;
+        }
+    };
+    window.propellerUpholder = propellerUpholder;
 })(planeFactory);
