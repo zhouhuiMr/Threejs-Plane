@@ -31,6 +31,9 @@ window.planeFactory = new Object();
             const plane_body_mesh = new plane_body();
             this.body.add(plane_body_mesh.build());
 
+            const body_site_mesh = new body_site();
+            this.body.add(body_site_mesh.build());
+
             const wing_back_mesh = new wing_back();
             this.body.add(wing_back_mesh.build());
 
@@ -92,27 +95,27 @@ window.planeFactory = new Object();
                 wireframe : true,
             } );
             //前端的上部机翼
-            this.bodyTopShape.moveTo(0,0);
-            this.bodyTopShape.lineTo((this.width - this.distance) / 2, 0);
+            this.bodyTopShape.moveTo(-this.width / 2 , -this.height / 2);
+            this.bodyTopShape.lineTo((-this.width + this.distance) / 2, -this.height / 2);
             this.bodyTopShape.absarc(
-                this.width / 2,
-                -1 * this.distance / 2 / Math.tan(this.distance_angle),
+                0,
+                -this.height / 2 - 1 * this.distance / 2 / Math.tan(this.distance_angle),
                 this.distance / 2 / Math.sin(this.distance_angle) ,
                 Math.PI / 2 + this.distance_angle,
                 Math.PI / 2 - this.distance_angle,
                 true
             );
-            this.bodyTopShape.lineTo(this.width , 0);
-            this.bodyTopShape.absarc( this.width, this.height / 2 , this.height / 2, -Math.PI / 2, Math.PI / 2, false );
-            this.bodyTopShape.lineTo(0, this.height);
-            this.bodyTopShape.absarc( 0, this.height / 2 , this.height / 2, Math.PI / 2, -Math.PI / 2, false );
+            this.bodyTopShape.lineTo(this.width / 2 , -this.height / 2);
+            this.bodyTopShape.absarc( this.width / 2, 0 , this.height / 2, -Math.PI / 2, Math.PI / 2, false );
+            this.bodyTopShape.lineTo(-this.width / 2, this.height /2);
+            this.bodyTopShape.absarc( -this.width / 2, 0 , this.height / 2, Math.PI / 2, -Math.PI / 2, false );
             this.bodyTopGeometry = new THREE.ExtrudeBufferGeometry(this.bodyTopShape,this.extrudeSettings);
 
-            this.bodyBottomShape.moveTo(0,0);
-            this.bodyBottomShape.lineTo(this.width , 0);
-            this.bodyBottomShape.absarc( this.width, this.height / 2 , this.height / 2, -Math.PI / 2, Math.PI / 2, false );
-            this.bodyBottomShape.lineTo(0, this.height);
-            this.bodyBottomShape.absarc( 0, this.height / 2 , this.height / 2, Math.PI / 2, -Math.PI / 2, false );
+            this.bodyBottomShape.moveTo(-this.width / 2 , -this.height / 2);
+            this.bodyBottomShape.lineTo(this.width / 2 , -this.height / 2);
+            this.bodyBottomShape.absarc( this.width / 2, 0 , this.height / 2, -Math.PI / 2, Math.PI / 2, false );
+            this.bodyBottomShape.lineTo(-this.width / 2 , this.height / 2);
+            this.bodyBottomShape.absarc( -this.width / 2, 0 , this.height / 2, Math.PI / 2, -Math.PI / 2, false );
             this.bodyBottomGeometry = new THREE.ExtrudeBufferGeometry(this.bodyBottomShape,this.extrudeSettings);
 
             this.setSite();
@@ -179,10 +182,10 @@ window.planeFactory = new Object();
             const geometry_3 = geometry_1.clone();
             const geometry_4 = geometry_1.clone();
 
-            geometry_1.translate(0.5, this.height / 2 - 0.1, 0.5);
-            geometry_2.translate(this.wing_width - 0.5, this.height / 2 - 0.1, 0.5);
-            geometry_3.translate(0.5, this.height / 2 - 0.1, this.wing_depth -0.5);
-            geometry_4.translate(this.wing_width - 0.5, this.height / 2 - 0.1, this.wing_depth -0.5);
+            geometry_1.translate(-this.wing_width / 2 , this.height / 2 - 0.1, -this.wing_depth / 2 + 0.5);
+            geometry_2.translate(this.wing_width / 2, this.height / 2 - 0.1, this.wing_depth / 2 - 0.5);
+            geometry_3.translate(-this.wing_width / 2 , this.height / 2 - 0.1, this.wing_depth / 2 - 0.5);
+            geometry_4.translate(this.wing_width / 2, this.height / 2 - 0.1, -this.wing_depth / 2 +0.5);
 
             const angle = Math.PI / 3;
             let upholderExtent = this.height / Math.sin(angle);
@@ -202,13 +205,29 @@ window.planeFactory = new Object();
             const geometry_8 = geometry_5.clone();
 
             geometry_5.rotateZ(Math.PI / 2 - angle);
-            geometry_5.translate(upholderExtent * Math.sin(angle) / 2, this.height / 2, 0.5);
+            geometry_5.translate(
+                -this.wing_width / 2 + upholderExtent * Math.sin(angle) / 2,
+                this.height / 2,
+                -this.wing_depth / 2 + 0.5
+            );
             geometry_6.rotateZ(Math.PI / 2 - angle);
-            geometry_6.translate(upholderExtent * Math.sin(angle) / 2, this.height / 2, this.wing_depth -0.5);
+            geometry_6.translate(
+                -this.wing_width / 2 + upholderExtent * Math.sin(angle) / 2,
+                this.height / 2,
+                this.wing_depth / 2 - 0.5
+            );
             geometry_7.rotateZ(-1 * (Math.PI / 2 - angle));
-            geometry_7.translate(this.wing_width - upholderExtent * Math.sin(angle) / 2, this.height / 2, 0.5);
+            geometry_7.translate(
+                this.wing_width / 2 - upholderExtent * Math.sin(angle) / 2,
+                this.height / 2,
+                -this.wing_depth / 2 + 0.5
+            );
             geometry_8.rotateZ(-1 * (Math.PI / 2 - angle));
-            geometry_8.translate(this.wing_width - upholderExtent * Math.sin(angle) / 2, this.height / 2, this.wing_depth -0.5);
+            geometry_8.translate(
+                this.wing_width / 2 - upholderExtent * Math.sin(angle) / 2,
+                this.height / 2,
+                this.wing_depth / 2 -0.5
+            );
 
             let shortUpholderExtent = (this.height - 4) / Math.sin(angle);
 
@@ -222,23 +241,17 @@ window.planeFactory = new Object();
                 this.thetaStart,
                 this.thetaLength
             );
-            const shortGeometry_2 = shortGeometry_1.clone();
             const shortGeometry_3 = shortGeometry_1.clone();
-            const shortGeometry_4 = shortGeometry_1.clone();
             shortGeometry_1.rotateZ(Math.PI / 2 - angle);
-            shortGeometry_1.translate(4.8, 4.8, 1.5);
-            shortGeometry_2.rotateZ(Math.PI / 2 - angle);
-            shortGeometry_2.translate(4.8, 4.8, this.wing_depth - 1);
+            shortGeometry_1.translate(-this.wing_width / 2 + 4.8, 4.8, -this.wing_depth / 2 + 2.5);
             shortGeometry_3.rotateZ(-1 * (Math.PI / 2 - angle));
-            shortGeometry_3.translate(9.2, 4.8, 1.5);
-            shortGeometry_4.rotateZ(-1 * (Math.PI / 2 - angle));
-            shortGeometry_4.translate(9.2, 4.8, this.wing_depth - 1);
+            shortGeometry_3.translate(this.wing_width / 2 - 4.8, 4.8, -this.wing_depth / 2 + 2.5);
 
 
             const geometries = [
                 geometry_1,geometry_2,geometry_3,geometry_4,
                 geometry_5,geometry_6,geometry_7,geometry_8,
-                shortGeometry_1,shortGeometry_2,shortGeometry_3,shortGeometry_4
+                shortGeometry_1,shortGeometry_3
             ];
             this.bodyGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries,false);
 
@@ -278,7 +291,7 @@ window.planeFactory = new Object();
     };
     plane_body.prototype = {
         init : function(){
-            const height_center = 4.5,
+            const height_center = 2,
                 height_front = this.radiusTop,
                 height_back = 9;
             //飞机身体的中间部分
@@ -298,11 +311,11 @@ window.planeFactory = new Object();
 
             //飞机身体的后边部分
             const backBodyOfPlane = buildBackBodyOfPlane(height_back,this.radiusTop,this.radialSegments);
-            backBodyOfPlane.translate(0, -1 * (height_back + height_center ) / 2,0);
+            backBodyOfPlane.translate(0, -1 * (height_back + height_center ) / 2 - 2,0);
 
             //图形合并
             const geometries = [frontBodyGeometry,centerBofyOfPlane,backBodyOfPlane];
-            //var geometries = [backBodyOfPlane];
+            //var geometries = [siteBodyGeometry];
             this.bodyGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries,false);
 
             this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
@@ -318,7 +331,7 @@ window.planeFactory = new Object();
             this.bodyGeometry.rotateX(1 * Math.PI / 2);
             this.bodyGeometry.rotateY(0);
             this.bodyGeometry.rotateZ(0);
-            this.bodyGeometry.translate(wing.width / 2,this.radiusTop - wing.depth,1.5);
+            this.bodyGeometry.translate(0,this.radiusTop - wing.depth,0.8);
         },
         build : function(){
             return this.body;
@@ -461,9 +474,9 @@ window.planeFactory = new Object();
             this.bodyGeometry.rotateZ(0);
             const wing_front_object = new wing_front();
             this.bodyGeometry.translate(
-                (wing_front_object.width + wing_front_object.height / 2 - this.singleWingRadius - 0.5) / 2,
+                0,
                 2.9,
-                -8.5
+                -10.5
             );
         },
         build : function(){
@@ -529,9 +542,9 @@ window.planeFactory = new Object();
             this.bodyGeometry.rotateZ(0);
             const wing_front_object = new wing_front();
             this.bodyGeometry.translate(
-                (wing_front_object.width + wing_front_object.height / 2 - this.singleWingRadius - 0.5) / 2,
+                0,
                 2.9,
-                -6.5
+                -7.8
             );
         },
         build : function(){
@@ -606,16 +619,16 @@ window.planeFactory = new Object();
             const wing_front_object = new wing_front();
             const plane_body_object = new plane_body();
             this.bodyGeometry.translate(
-                wing_front_object.width /2 ,
+                0,
                 plane_body_object.radiusTop - 0.3,
-                plane_body_object.height / 2 - 0.6
+                plane_body_object.height / 2 - 2.5
             );
         },
         build : function(){
             return this.body;
         }
     };
-    window.propeller = propeller;
+    w.propeller = propeller;
 
 
     let propellerUpholder = function(){
@@ -657,14 +670,93 @@ window.planeFactory = new Object();
             const wing_front_object = new wing_front();
             const plane_body_object = new plane_body();
             this.bodyGeometry.translate(
-                wing_front_object.width /2 ,
+                0,
                 plane_body_object.radiusTop - 0.3,
-                plane_body_object.height / 2 + 0.3
+                plane_body_object.height / 2 - 1.7
             );
         },
         build : function(){
             return this.body;
         }
     };
-    window.propellerUpholder = propellerUpholder;
+    w.propellerUpholder = propellerUpholder;
+
+    /**
+     * 创建飞机的座位
+     * @param radius 半径
+     * @param segments 边数
+     * @param depth 挤出大小
+     * @since 2019.11.05
+     * */
+    let body_site = function(){
+        this.body = null;
+        this.bodyGeometry = null;
+
+        this.depth = 2;
+        this.radius = 2.5;
+        this.segments = 8;
+        this.fixAngle = 1 * Math.PI / 6;//座位的其实角度
+
+        this.bodyShape = new THREE.Shape();
+        this.bodyMaterial = null;
+        this.extrudeSettings = null;
+        this.materialColor = 0x00ff00;
+
+        this.init();
+    };
+    body_site.prototype = {
+        init : function(){
+            this.extrudeSettings = {
+                depth: this.depth,
+                bevelEnabled: false,
+                bevelSegments: 2,
+                steps: 1,
+                bevelSize: 0,
+                bevelThickness: 1,
+                bevelOffset: 0
+            };
+
+            //材质
+            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+                color: this.materialColor,
+                side : THREE.FrontSide,
+                wireframe : true,
+            } );
+
+            const siteX_1 = this.radius * Math.cos(this.fixAngle) - 0.2,
+                siteY_1 = this.radius * Math.sin(this.fixAngle),
+                siteX_2 = -1 * siteX_1,
+                siteY_2 = siteY_1;
+            const minAngle = this.fixAngle,
+                   maxAngle = Math.PI - this.fixAngle;
+
+            const angel = Math.PI * 2 / this.segments;
+            for(let i = 0; i <= this.segments; i++){
+                let x = Math.cos(angel * i) * this.radius,
+                    y = Math.sin(angel * i) * this.radius;
+                if(y >= siteY_1){
+                    this.bodyShape.lineTo(siteX_1,siteY_1);
+                    this.bodyShape.lineTo(siteX_2,siteY_2);
+                    continue
+                }
+                this.bodyShape.lineTo(x,y);
+            }
+            this.bodyGeometry = new THREE.ExtrudeBufferGeometry( this.bodyShape, this.extrudeSettings );
+            this.setSite();
+            this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
+        },
+        setSite : function(){
+            const wing_front_object = new wing_front();
+            const plane_body_object = new plane_body();
+            this.bodyGeometry.translate(
+                0,
+                plane_body_object.radiusTop - 0.4,
+                - 2.2
+            );
+        },
+        build : function(){
+            return this.body;
+        }
+    };
+    w.body_site = body_site;
 })(planeFactory);
