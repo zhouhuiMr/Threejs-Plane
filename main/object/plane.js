@@ -46,6 +46,9 @@ window.planeFactory = new Object();
             const propellerUpholder_mesh = new propellerUpholder();
             this.body.add(propellerUpholder_mesh.build());
 
+            const front_wheel_mesh = new front_wheel();
+            this.body.add(front_wheel_mesh.build());
+
             this.scene.add(this.body);
         }
     };
@@ -759,4 +762,54 @@ window.planeFactory = new Object();
         }
     };
     w.body_site = body_site;
+
+    /**
+     * 飞机前边的轮子
+     * @since 2019.11.08
+     * */
+    let front_wheel = function(){
+        this.body = null;
+        this.bodyGeometry = null;
+
+        this.radius = 0.8;
+        this.depth = 0.1;
+
+        this.bodyShape = new THREE.Shape();
+        this.bodyMaterial = null;
+        this.extrudeSettings = null;
+        this.materialColor = 0x00ff00;
+
+        this.init();
+    };
+    front_wheel.prototype = {
+        init : function(){
+            this.extrudeSettings = {
+                depth: this.depth,
+                bevelEnabled: true,
+                bevelSegments: 1,
+                steps: 1,
+                bevelSize: 0.1,
+                bevelThickness: 0.2,
+                bevelOffset: 0.5
+            };
+
+            //材质
+            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+                color: this.materialColor,
+                side : THREE.FrontSide,
+                wireframe : true,
+            } );
+            this.bodyShape.absarc(0,0,this.radius,0,6.4,true);
+            this.bodyGeometry = new THREE.ExtrudeBufferGeometry( this.bodyShape, this.extrudeSettings );
+            this.setSite();
+            this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
+        },
+        setSite : function(){
+
+        },
+        build : function(){
+            return this.body
+        }
+    };
+    w.front_wheel = front_wheel;
 })(planeFactory);
