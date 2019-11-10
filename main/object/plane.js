@@ -46,8 +46,8 @@ window.planeFactory = new Object();
             const propellerUpholder_mesh = new propellerUpholder();
             this.body.add(propellerUpholder_mesh.build());
 
-            const front_wheel_mesh = new front_wheel();
-            this.body.add(front_wheel_mesh.build());
+            /*const front_wheel_mesh = new front_wheel();
+            this.body.add(front_wheel_mesh.build());*/
 
             this.scene.add(this.body);
         }
@@ -768,15 +768,23 @@ window.planeFactory = new Object();
      * @since 2019.11.08
      * */
     let front_wheel = function(){
-        this.body = null;
-        this.bodyGeometry = null;
+        this.body = new THREE.Group();
+        this.body_1 = null;
+        this.bodyGeometry_1 = null;//其中一个轮子
+        this.body_2 = null;
+        this.bodyGeometry_2 = null;//另一个轮子
 
-        this.radius = 0.8;
+        this.wheel_uphold_angle = Math.PI / 3;//轮胎支撑物的角度
+
+        this.radius = 0.3;
         this.depth = 0.1;
 
-        this.bodyShape = new THREE.Shape();
+        this.bodyShape_wheel = new THREE.Shape();//轮子的形状
+        this.bodyShape_wheel_upholder = new THREE.Shape();//轮子的支撑物形状
+
         this.bodyMaterial = null;
-        this.extrudeSettings = null;
+        this.extrudeSettings_wheel = null;
+        this.extrudeSettings_upholder = null;
         this.materialColor = 0x00ff00;
 
         this.init();
@@ -790,7 +798,7 @@ window.planeFactory = new Object();
                 steps: 1,
                 bevelSize: 0.1,
                 bevelThickness: 0.2,
-                bevelOffset: 0.5
+                bevelOffset: 0.3
             };
 
             //材质
@@ -799,13 +807,19 @@ window.planeFactory = new Object();
                 side : THREE.FrontSide,
                 wireframe : true,
             } );
-            this.bodyShape.absarc(0,0,this.radius,0,6.4,true);
-            this.bodyGeometry = new THREE.ExtrudeBufferGeometry( this.bodyShape, this.extrudeSettings );
+            this.bodyShape_wheel.absarc(0,0,this.radius,0,6.4,true);
+            this.bodyGeometry_1 = new THREE.ExtrudeBufferGeometry( this.bodyShape_wheel, this.extrudeSettings_wheel );
+            this.bodyGeometry_2 = this.bodyGeometry_1.clone();
             this.setSite();
-            this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
+            this.body_1 = new THREE.Mesh(this.bodyGeometry_1 , this.bodyMaterial);
+            this.body_2 = new THREE.Mesh(this.bodyGeometry_2 , this.bodyMaterial);
+            this.body.add(this.body_1);
+            this.body.add(this.body_2);
         },
         setSite : function(){
-
+            this.bodyGeometry_1.rotateY(Math.PI / 2);
+            this.bodyGeometry_2.rotateY(Math.PI / 2);
+            this.bodyGeometry_1.translate(10,0,0);
         },
         build : function(){
             return this.body
