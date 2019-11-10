@@ -46,8 +46,8 @@ window.planeFactory = new Object();
             const propellerUpholder_mesh = new propellerUpholder();
             this.body.add(propellerUpholder_mesh.build());
 
-            /*const front_wheel_mesh = new front_wheel();
-            this.body.add(front_wheel_mesh.build());*/
+            const front_wheel_mesh = new front_wheel();
+            this.body.add(front_wheel_mesh.build());
 
             this.scene.add(this.body);
         }
@@ -774,10 +774,18 @@ window.planeFactory = new Object();
         this.body_2 = null;
         this.bodyGeometry_2 = null;//另一个轮子
 
-        this.wheel_uphold_angle = Math.PI / 3;//轮胎支撑物的角度
+        this.body_upholder_1 = null;
+        this.body_upholder_2 = null;
+        this.bodyGeometry_upholder_1 = null;
+        this.bodyGeometry_upholder_2 = null;
+        this.upholderInterval = 5;
 
         this.radius = 0.3;
         this.depth = 0.1;
+
+        this.upholder_Height = 1.2;
+        this.upholder_Weight = 0.1;
+        this.upholder_Angle = Math.PI / 3;//轮胎支撑物的角度
 
         this.bodyShape_wheel = new THREE.Shape();//轮子的形状
         this.bodyShape_wheel_upholder = new THREE.Shape();//轮子的支撑物形状
@@ -791,7 +799,7 @@ window.planeFactory = new Object();
     };
     front_wheel.prototype = {
         init : function(){
-            this.extrudeSettings = {
+            this.extrudeSettings_wheel = {
                 depth: this.depth,
                 bevelEnabled: true,
                 bevelSegments: 1,
@@ -800,26 +808,82 @@ window.planeFactory = new Object();
                 bevelThickness: 0.2,
                 bevelOffset: 0.3
             };
+            this.extrudeSettings_upholder = {
+                depth: this.depth,
+                bevelEnabled: true,
+                bevelSegments: 1,
+                steps: 1,
+                bevelSize: 0.1,
+                bevelThickness: 0.1,
+                bevelOffset: 0.1
+            };
 
             //材质
-            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+            this.bodyMaterial_wheel = new THREE.MeshLambertMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
                 wireframe : true,
             } );
+            this.bodyMaterial_upholder = new THREE.MeshPhysicalMaterial( {
+                color: this.materialColor,
+                side : THREE.FrontSide,
+                wireframe : true,
+            } );
+
             this.bodyShape_wheel.absarc(0,0,this.radius,0,6.4,true);
-            this.bodyGeometry_1 = new THREE.ExtrudeBufferGeometry( this.bodyShape_wheel, this.extrudeSettings_wheel );
+            this.bodyGeometry_1 = new THREE.ExtrudeBufferGeometry(
+                this.bodyShape_wheel,
+                this.extrudeSettings_wheel
+            );
             this.bodyGeometry_2 = this.bodyGeometry_1.clone();
+
+            //支撑物的形状
+            this.bodyShape_wheel_upholder.moveTo(0,this.upholder_Height / 2);
+            this.bodyShape_wheel_upholder.lineTo(-this.upholder_Weight , this.upholder_Height / 2);
+            this.bodyShape_wheel_upholder.lineTo(-this.upholder_Weight, -this.upholder_Height / 2);
+            this.bodyShape_wheel_upholder.lineTo(0, -this.upholder_Height / 2);
+            let move_width = this.upholder_Height / 2 * Math.tan(this.upholder_Angle);
+            this.bodyShape_wheel_upholder.lineTo(move_width , this.upholder_Height / 2);
+            this.bodyShape_wheel_upholder.lineTo(move_width - this.upholder_Weight, this.upholder_Height / 2);
+            let move_height = this.upholder_Weight / Math.tan(this.upholder_Angle);
+            this.bodyShape_wheel_upholder.lineTo(0, move_height - this.upholder_Height / 2);
+            this.bodyShape_wheel_upholder.lineTo(0, this.upholder_Height / 2);
+
+            this.bodyGeometry_upholder_1 = new THREE.ExtrudeBufferGeometry(
+                this.bodyShape_wheel_upholder,
+                this.extrudeSettings_upholder
+            );
+            this.bodyGeometry_upholder_2 = this.bodyGeometry_upholder_1.clone();
+
             this.setSite();
-            this.body_1 = new THREE.Mesh(this.bodyGeometry_1 , this.bodyMaterial);
-            this.body_2 = new THREE.Mesh(this.bodyGeometry_2 , this.bodyMaterial);
+            this.body_1 = new THREE.Mesh(this.bodyGeometry_1 , this.bodyMaterial_wheel);
+            this.body_2 = new THREE.Mesh(this.bodyGeometry_2 , this.bodyMaterial_wheel);
+            this.body_upholder_1 = new THREE.Mesh(this.bodyGeometry_upholder_1 , this.bodyMaterial_upholder);
+            this.body_upholder_2 = new THREE.Mesh(this.bodyGeometry_upholder_2 , this.bodyMaterial_upholder);
             this.body.add(this.body_1);
             this.body.add(this.body_2);
+            this.body.add(this.body_upholder_1);
+            this.body.add(this.body_upholder_2);
         },
         setSite : function(){
+            const rotate_z = Math.PI / 6;
             this.bodyGeometry_1.rotateY(Math.PI / 2);
             this.bodyGeometry_2.rotateY(Math.PI / 2);
-            this.bodyGeometry_1.translate(10,0,0);
+            this.bodyGeometry_1.translate(0.4,-this.upholder_Height - this.radius, -0.1);
+            this.bodyGeometry_2.translate(-0.6,-this.upholder_Height - this.radius, -0.1);
+            this.bodyGeometry_upholder_1.rotateY(-Math.PI / 2);
+            this.bodyGeometry_upholder_1.rotateZ(rotate_z);
+            this.bodyGeometry_upholder_1.translate(0,-this.upholder_Height / 2 - 0.2,0);
+            this.bodyGeometry_upholder_2.rotateY(-Math.PI / 2);
+            this.bodyGeometry_upholder_2.rotateZ(-rotate_z);
+            this.bodyGeometry_upholder_2.translate(0,-this.upholder_Height / 2 - 0.2,0);
+
+            //设置轮胎的位置
+            const move_z = 0.5;
+            this.bodyGeometry_1.translate(this.upholderInterval / 2, 0, move_z);
+            this.bodyGeometry_upholder_1.translate(this.upholderInterval / 2, 0, move_z);
+            this.bodyGeometry_2.translate(-this.upholderInterval / 2, 0, move_z);
+            this.bodyGeometry_upholder_2.translate(-this.upholderInterval / 2, 0, move_z);
         },
         build : function(){
             return this.body
