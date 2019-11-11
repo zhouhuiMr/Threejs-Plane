@@ -72,7 +72,7 @@ window.planeFactory = new Object();
 
         this.materialColor = 0x00ff00;
         this.distance = 4;
-        this.distance_angle = Math.PI / 4;
+        this.distance_angle = Math.PI / 3;
 
         this.extrudeSettings = null;
 
@@ -773,22 +773,31 @@ window.planeFactory = new Object();
         this.bodyGeometry_1 = null;//其中一个轮子
         this.body_2 = null;
         this.bodyGeometry_2 = null;//另一个轮子
+        this.body_3 = null;
+        this.bodyGeometry_3 = null;//后方的一个轮子
 
         this.body_upholder_1 = null;
         this.body_upholder_2 = null;
+        this.body_upholder_3 = null;//后方的支撑物
         this.bodyGeometry_upholder_1 = null;
         this.bodyGeometry_upholder_2 = null;
+        this.bodyGeometry_upholder_3 = null;
         this.upholderInterval = 5;
 
-        this.radius = 0.3;
+        this.radius = 0.5;
         this.depth = 0.1;
+        this.radius_hind = 0.1;
 
         this.upholder_Height = 1.2;
         this.upholder_Weight = 0.1;
         this.upholder_Angle = Math.PI / 3;//轮胎支撑物的角度
+        this.upholder_Height_hind = 0.5;
+        this.upholder_Weight_hind = 0.5;
 
         this.bodyShape_wheel = new THREE.Shape();//轮子的形状
         this.bodyShape_wheel_upholder = new THREE.Shape();//轮子的支撑物形状
+        this.bodyShape_wheel_hind = new THREE.Shape();//后端轮子的形状
+        this.bodyShape_wheel_upholder_hind = new THREE.Shape();//后端轮子的支撑物形状
 
         this.bodyMaterial = null;
         this.extrudeSettings_wheel = null;
@@ -837,6 +846,13 @@ window.planeFactory = new Object();
             );
             this.bodyGeometry_2 = this.bodyGeometry_1.clone();
 
+            //后端轮胎
+            this.bodyShape_wheel_hind.absarc(0,0,this.radius_hind,0,6.4,true);
+            this.bodyGeometry_3 = new THREE.ExtrudeBufferGeometry(
+                this.bodyShape_wheel_hind,
+                this.extrudeSettings_wheel
+            );
+
             //支撑物的形状
             this.bodyShape_wheel_upholder.moveTo(0,this.upholder_Height / 2);
             this.bodyShape_wheel_upholder.lineTo(-this.upholder_Weight , this.upholder_Height / 2);
@@ -855,28 +871,59 @@ window.planeFactory = new Object();
             );
             this.bodyGeometry_upholder_2 = this.bodyGeometry_upholder_1.clone();
 
+            //后方轮胎支撑物
+            let dis = 0.2;
+            this.bodyShape_wheel_upholder_hind.moveTo(
+                -this.upholder_Weight_hind / 2,
+                this.upholder_Height_hind / 2
+            );
+            this.bodyShape_wheel_upholder_hind.lineTo(
+                -this.upholder_Weight_hind / 2 + dis,
+                -this.upholder_Height_hind / 2
+            );
+            this.bodyShape_wheel_upholder_hind.lineTo(
+                this.upholder_Weight_hind / 2 - dis,
+                -this.upholder_Height_hind / 2
+            );
+            this.bodyShape_wheel_upholder_hind.lineTo(
+                this.upholder_Weight_hind / 2,
+                this.upholder_Height_hind / 2
+            );
+            this.bodyGeometry_upholder_3 = new THREE.ExtrudeBufferGeometry(
+                this.bodyShape_wheel_upholder_hind,
+                this.extrudeSettings_upholder
+            );
+
             this.setSite();
             this.body_1 = new THREE.Mesh(this.bodyGeometry_1 , this.bodyMaterial_wheel);
             this.body_2 = new THREE.Mesh(this.bodyGeometry_2 , this.bodyMaterial_wheel);
+            this.body_3 = new THREE.Mesh(this.bodyGeometry_3 , this.bodyMaterial_wheel);
             this.body_upholder_1 = new THREE.Mesh(this.bodyGeometry_upholder_1 , this.bodyMaterial_upholder);
             this.body_upholder_2 = new THREE.Mesh(this.bodyGeometry_upholder_2 , this.bodyMaterial_upholder);
+            this.body_upholder_3 = new THREE.Mesh(this.bodyGeometry_upholder_3 , this.bodyMaterial_upholder);
             this.body.add(this.body_1);
             this.body.add(this.body_2);
+            this.body.add(this.body_3);
             this.body.add(this.body_upholder_1);
             this.body.add(this.body_upholder_2);
+            this.body.add(this.body_upholder_3);
         },
         setSite : function(){
             const rotate_z = Math.PI / 6;
             this.bodyGeometry_1.rotateY(Math.PI / 2);
             this.bodyGeometry_2.rotateY(Math.PI / 2);
-            this.bodyGeometry_1.translate(0.4,-this.upholder_Height - this.radius, -0.1);
-            this.bodyGeometry_2.translate(-0.6,-this.upholder_Height - this.radius, -0.1);
+            this.bodyGeometry_3.rotateY(Math.PI / 2);
+            this.bodyGeometry_1.translate(0.4,-this.upholder_Height - this.radius / 2, -0.1);
+            this.bodyGeometry_2.translate(-0.6,-this.upholder_Height - this.radius / 2 - 0.2, -0.1);
             this.bodyGeometry_upholder_1.rotateY(-Math.PI / 2);
             this.bodyGeometry_upholder_1.rotateZ(rotate_z);
             this.bodyGeometry_upholder_1.translate(0,-this.upholder_Height / 2 - 0.2,0);
             this.bodyGeometry_upholder_2.rotateY(-Math.PI / 2);
             this.bodyGeometry_upholder_2.rotateZ(-rotate_z);
             this.bodyGeometry_upholder_2.translate(0,-this.upholder_Height / 2 - 0.2,0);
+            this.bodyGeometry_upholder_3.rotateY(-Math.PI / 2);
+            this.bodyGeometry_upholder_3.rotateX(Math.PI / 6);
+            this.bodyGeometry_upholder_3.translate(-0.4,(this.upholder_Height_hind + this.radius_hind) / 2 - 0.1,0.1);
 
             //设置轮胎的位置
             const move_z = 0.5;
@@ -884,6 +931,10 @@ window.planeFactory = new Object();
             this.bodyGeometry_upholder_1.translate(this.upholderInterval / 2, 0, move_z);
             this.bodyGeometry_2.translate(-this.upholderInterval / 2, 0, move_z);
             this.bodyGeometry_upholder_2.translate(-this.upholderInterval / 2, 0, move_z);
+            const move_hind_z = -11;
+            const move_hind_y = 2;
+            this.bodyGeometry_3.translate(0,move_hind_y,move_hind_z);
+            this.bodyGeometry_upholder_3.translate(0,move_hind_y+0.2,move_hind_z);
         },
         build : function(){
             return this.body
