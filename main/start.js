@@ -8,7 +8,10 @@ window.onload = function(){
 
     window.helper = new threejsHelper();
 
-    new window.planeFactory.plane(helper.scene);
+    window.myplane = new window.planeFactory.plane(helper.scene);
+    helper.animateQuee.push(function(){
+           myplane.runAnimate();
+    });
 
     helper.animate();
 
@@ -99,6 +102,7 @@ window.onload = function(){
             if(this.isUseController){
                 this.controls.build();
             }
+            //myplane.runAnimate();
             //执行其他动画
             for(var i=0;i<this.animateQuee.length;i++){
                 if(this.animateQuee[i] != null){

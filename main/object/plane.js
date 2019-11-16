@@ -14,42 +14,48 @@ window.planeFactory = new Object();
     let plane = function(scene){
         this.scene = scene;
         this.body =new THREE.Group();
+
+        this.wing_front_mesh = new wing_front();//飞机的机翼
+        this.wing_upholder_mesh = null;//飞机机翼的支撑物
+        this.plane_body_mesh = new plane_body();//飞机的机身
+        this.body_site_mesh = new body_site();//飞机的座位
+        this.wing_back_mesh = new wing_back();//飞机的后端尾翼
+        this.empennage_mesh = new empennage();//飞机的垂直尾翼
+        this.propeller_mesh = new propeller();// 飞机的螺旋桨
+        this.propellerUpholder_mesh = new propellerUpholder();// 飞机的螺旋桨的支撑物
+        this.front_wheel_mesh = new front_wheel();// 飞机的轮胎
+
         this.init();
     };
     plane.prototype = {
         init : function(){
-            const wing_front_mesh = new wing_front();
-            this.body.add(wing_front_mesh.build());
+            this.body.add(this.wing_front_mesh.build());
 
-            const wing_upholder_mesh = new wing_upholder(
-                wing_front_mesh.width,
-                wing_front_mesh.height,
-                wing_front_mesh.heightDifference
+            this.wing_upholder_mesh = new wing_upholder(
+                this.wing_front_mesh.width,
+                this.wing_front_mesh.height,
+                this.wing_front_mesh.heightDifference
             );
-            this.body.add(wing_upholder_mesh.build());
+            this.body.add(this.wing_upholder_mesh.build());
 
-            const plane_body_mesh = new plane_body();
-            this.body.add(plane_body_mesh.build());
+            this.body.add(this.plane_body_mesh.build());
 
-            const body_site_mesh = new body_site();
-            this.body.add(body_site_mesh.build());
+            this.body.add(this.body_site_mesh.build());
 
-            const wing_back_mesh = new wing_back();
-            this.body.add(wing_back_mesh.build());
+            this.body.add(this.wing_back_mesh.build());
 
-            const empennage_mesh = new empennage();
-            this.body.add(empennage_mesh.build());
+            this.body.add(this.empennage_mesh.build());
 
-            const propeller_mesh = new propeller();
-            this.body.add(propeller_mesh.build());
+            this.body.add(this.propeller_mesh.build());
 
-            const propellerUpholder_mesh = new propellerUpholder();
-            this.body.add(propellerUpholder_mesh.build());
+            this.body.add(this.propellerUpholder_mesh.build());
 
-            const front_wheel_mesh = new front_wheel();
-            this.body.add(front_wheel_mesh.build());
+            this.body.add(this.front_wheel_mesh.build());
 
             this.scene.add(this.body);
+        },
+        runAnimate : function(){
+            this.propeller_mesh.body.rotateZ(0.8);
         }
     };
     w.plane = plane;
@@ -617,15 +623,18 @@ window.planeFactory = new Object();
             this.bodyGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries,false);
             this.setSite();
             this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
+
+            const plane_body_object = new plane_body();
+            this.body.translateY(plane_body_object.radiusTop - 0.3);
+            this.body.translateZ(plane_body_object.height / 2 - 2.5);
         },
         setSite : function(){
-            const wing_front_object = new wing_front();
-            const plane_body_object = new plane_body();
-            this.bodyGeometry.translate(
-                0,
-                plane_body_object.radiusTop - 0.3,
-                plane_body_object.height / 2 - 2.5
-            );
+            //const plane_body_object = new plane_body();
+            // this.bodyGeometry.translate(
+            //     0,
+            //     plane_body_object.radiusTop - 0.3,
+            //     plane_body_object.height / 2 - 2.5
+            // );
         },
         build : function(){
             return this.body;
