@@ -7,6 +7,13 @@
  */
 window.planeFactory = new Object();
 (function(w){
+
+    let commonProperties = function(){
+        this.isUseWireframe = false; //是否显示线条，true显示为线条
+        this.isCastShadow = false;
+        this.isReceiveShadow = false;
+    };
+
     /**
      * 飞机的对象，用此对象进行飞机的创建
      * @since 2019.10.09
@@ -24,6 +31,7 @@ window.planeFactory = new Object();
         this.propeller_mesh = new propeller();// 飞机的螺旋桨
         this.propellerUpholder_mesh = new propellerUpholder();// 飞机的螺旋桨的支撑物
         this.front_wheel_mesh = new front_wheel();// 飞机的轮胎
+
 
         this.init();
     };
@@ -87,6 +95,8 @@ window.planeFactory = new Object();
     };
     wing_front.prototype = {
         init : function(){
+            //属性继承
+            commonProperties.call(this);
             //挤出的设置
             this.extrudeSettings = {
                 depth: this.depth,
@@ -101,7 +111,7 @@ window.planeFactory = new Object();
             this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
-                wireframe : true,
+                wireframe : this.isUseWireframe,
             } );
             //前端的上部机翼
             this.bodyTopShape.moveTo(-this.width / 2 , -this.height / 2);
@@ -177,6 +187,8 @@ window.planeFactory = new Object();
     };
     wing_upholder.prototype = {
         init : function(){
+            //属性继承
+            commonProperties.call(this);
             const geometry_1 = new THREE.CylinderBufferGeometry(
                 this.radiusTop,
                 this.radiusBottom,
@@ -267,7 +279,7 @@ window.planeFactory = new Object();
             this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
-                wireframe : true,
+                wireframe : this.isUseWireframe,
             });
             this.body = new THREE.Mesh( this.bodyGeometry, this.bodyMaterial ) ;
         },
@@ -300,6 +312,8 @@ window.planeFactory = new Object();
     };
     plane_body.prototype = {
         init : function(){
+            //属性继承
+            commonProperties.call(this);
             const height_center = 2,
                 height_front = this.radiusTop,
                 height_back = 9;
@@ -310,7 +324,7 @@ window.planeFactory = new Object();
                 height_center,
                 this.radialSegments,
                 1,
-                true,
+                false,
                 this.thetaStart,
                 this.thetaLength
             );
@@ -330,7 +344,7 @@ window.planeFactory = new Object();
             this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
-                wireframe : true,
+                wireframe : this.isUseWireframe,
             } );
             this.setSite();
             this.body = new THREE.Mesh( this.bodyGeometry, this.bodyMaterial ) ;
@@ -426,6 +440,8 @@ window.planeFactory = new Object();
     };
     wing_back.prototype = {
         init : function(){
+            //属性继承
+            commonProperties.call(this);
             //挤出的设置
             this.extrudeSettings = {
                 depth: 0.2,
@@ -440,7 +456,7 @@ window.planeFactory = new Object();
             this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
-                wireframe : true,
+                wireframe : this.isUseWireframe,
             } );
 
             this.bodyShape.moveTo(0,0);
@@ -516,6 +532,8 @@ window.planeFactory = new Object();
     };
     empennage.prototype = {
         init : function(){
+            //属性继承
+            commonProperties.call(this);
             //挤出的设置
             this.extrudeSettings = {
                 depth: 0.2,
@@ -530,7 +548,7 @@ window.planeFactory = new Object();
             this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
-                wireframe : true,
+                wireframe : this.isUseWireframe,
             } );
             this.bodyShape.moveTo(0,0);
             this.bodyShape.lineTo(this.maxWidth - 0.7,this.maxHeight - 0.5);
@@ -587,6 +605,8 @@ window.planeFactory = new Object();
     };
     propeller.prototype = {
         init : function(){
+            //属性继承
+            commonProperties.call(this);
             //挤出的设置
             this.extrudeSettings = {
                 depth: 0.05,
@@ -601,7 +621,7 @@ window.planeFactory = new Object();
             this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
-                wireframe : true,
+                wireframe : this.isUseWireframe,
             } );
             this.bodyShape.moveTo(0,0);
             this.bodyShape.bezierCurveTo(
@@ -657,11 +677,13 @@ window.planeFactory = new Object();
     };
     propellerUpholder.prototype = {
         init : function(){
+            //属性继承
+            commonProperties.call(this);
             //材质
             this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
-                wireframe : true,
+                wireframe : this.isUseWireframe,
             } );
 
             this.points.push( new THREE.Vector3(0, 0.4, 0));
@@ -718,6 +740,9 @@ window.planeFactory = new Object();
     };
     body_site.prototype = {
         init : function(){
+            //属性继承
+            commonProperties.call(this);
+
             this.extrudeSettings = {
                 depth: this.depth,
                 bevelEnabled: false,
@@ -732,7 +757,7 @@ window.planeFactory = new Object();
             this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
-                wireframe : true,
+                wireframe : this.isUseWireframe,
             } );
 
             const siteX_1 = this.radius * Math.cos(this.fixAngle) - 0.2,
@@ -817,6 +842,9 @@ window.planeFactory = new Object();
     };
     front_wheel.prototype = {
         init : function(){
+            //属性继承
+            commonProperties.call(this);
+
             this.extrudeSettings_wheel = {
                 depth: this.depth,
                 bevelEnabled: true,
@@ -840,12 +868,12 @@ window.planeFactory = new Object();
             this.bodyMaterial_wheel = new THREE.MeshLambertMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
-                wireframe : true,
+                wireframe : this.isUseWireframe,
             } );
             this.bodyMaterial_upholder = new THREE.MeshPhysicalMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
-                wireframe : true,
+                wireframe : this.isUseWireframe,
             } );
 
             this.bodyShape_wheel.absarc(0,0,this.radius,0,6.4,true);
