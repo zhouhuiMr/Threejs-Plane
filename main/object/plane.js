@@ -3,7 +3,8 @@
  * 主要构件:1、飞机的螺旋桨；2、飞机前端的上下两个机翼；3、飞机的机身；
  * 4、飞机后端的尾翼；5、座位及挡风玻璃；6、飞机的轮胎，前边两个以及后边的一个；
  *
- * Created by zhouhui on 2019/10/5.
+ * @since 2019.10.05
+ * @author zhouhui
  */
 window.planeFactory = new Object();
 (function(w){
@@ -31,7 +32,6 @@ window.planeFactory = new Object();
         this.propeller_mesh = new propeller();// 飞机的螺旋桨
         this.propellerUpholder_mesh = new propellerUpholder();// 飞机的螺旋桨的支撑物
         this.front_wheel_mesh = new front_wheel();// 飞机的轮胎
-
 
         this.init();
     };
@@ -84,7 +84,7 @@ window.planeFactory = new Object();
 
         this.bodyMaterial = null;
 
-        this.materialColor = 0x00ff00;
+        this.materialColor = 0xbdbdbc;
         this.distance = 4;
         this.distance_angle = Math.PI / 3;
 
@@ -171,7 +171,7 @@ window.planeFactory = new Object();
         this.bodyGeometry = null;
         this.bodyMaterial = null;
 
-        this.materialColor = 0x00ff00;
+        this.materialColor = 0xbdbdbc;
 
         this.wing_width = wing_width;
         this.wing_depth = wing_depth;
@@ -307,7 +307,7 @@ window.planeFactory = new Object();
         this.bodyGeometry = null;
 
         this.bodyMaterial = null;
-        this.materialColor = 0x00ff00;
+        this.materialColor = 0xbdbdbc;
         this.init();
     };
     plane_body.prototype = {
@@ -434,7 +434,7 @@ window.planeFactory = new Object();
         this.bodyMaterial = null;
         this.extrudeSettings = null;
 
-        this.materialColor = 0x00ff00;
+        this.materialColor = 0xbdbdbc;
 
         this.init();
     };
@@ -526,7 +526,7 @@ window.planeFactory = new Object();
         this.bodyMaterial = null;
         this.extrudeSettings = null;
 
-        this.materialColor = 0x00ff00;
+        this.materialColor = 0xbdbdbc;
 
         this.init();
     };
@@ -599,7 +599,7 @@ window.planeFactory = new Object();
         this.bodyMaterial = null;
         this.extrudeSettings = null;
 
-        this.materialColor = 0x00ff00;
+        this.materialColor = 0xbdbdbc;
 
         this.init();
     };
@@ -669,7 +669,7 @@ window.planeFactory = new Object();
 
         this.bodyMaterial = null;
 
-        this.materialColor = 0x00ff00;
+        this.materialColor = 0xbdbdbc;
 
         this.points = [];
 
@@ -734,7 +734,7 @@ window.planeFactory = new Object();
         this.bodyShape = new THREE.Shape();
         this.bodyMaterial = null;
         this.extrudeSettings = null;
-        this.materialColor = 0x00ff00;
+        this.materialColor = 0xbdbdbc;
 
         this.init();
     };
@@ -836,7 +836,8 @@ window.planeFactory = new Object();
         this.bodyMaterial = null;
         this.extrudeSettings_wheel = null;
         this.extrudeSettings_upholder = null;
-        this.materialColor = 0x00ff00;
+        this.materialColor_wheel = 0x000000;
+        this.materialColor_upholder = 0xd1d1d1;
 
         this.init();
     };
@@ -866,12 +867,12 @@ window.planeFactory = new Object();
 
             //材质
             this.bodyMaterial_wheel = new THREE.MeshLambertMaterial( {
-                color: this.materialColor,
+                color: this.materialColor_wheel,
                 side : THREE.FrontSide,
                 wireframe : this.isUseWireframe,
             } );
             this.bodyMaterial_upholder = new THREE.MeshPhysicalMaterial( {
-                color: this.materialColor,
+                color: this.materialColor_upholder,
                 side : THREE.FrontSide,
                 wireframe : this.isUseWireframe,
             } );
@@ -960,7 +961,7 @@ window.planeFactory = new Object();
             this.bodyGeometry_upholder_2.translate(0,-this.upholder_Height / 2 - 0.2,0);
             this.bodyGeometry_upholder_3.rotateY(-Math.PI / 2);
             this.bodyGeometry_upholder_3.rotateX(Math.PI / 6);
-            this.bodyGeometry_upholder_3.translate(-0.4,(this.upholder_Height_hind + this.radius_hind) / 2 - 0.1,0.1);
+            this.bodyGeometry_upholder_3.translate(0,(this.upholder_Height_hind + this.radius_hind) / 2 - 0.1,0.1);
 
             //设置轮胎的位置
             const move_z = 0.5;
@@ -970,7 +971,7 @@ window.planeFactory = new Object();
             this.bodyGeometry_upholder_2.translate(-this.upholderInterval / 2, 0, move_z);
             const move_hind_z = -11;
             const move_hind_y = 2;
-            this.bodyGeometry_3.translate(0,move_hind_y,move_hind_z);
+            this.bodyGeometry_3.translate(0.2,move_hind_y,move_hind_z);
             this.bodyGeometry_upholder_3.translate(0,move_hind_y+0.2,move_hind_z);
         },
         build : function(){

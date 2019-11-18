@@ -8,6 +8,11 @@ window.onload = function(){
 
     window.helper = new threejsHelper();
 
+
+    //创建光线
+    new window.lightFactory.hemisphereLight(helper.scene);
+
+    //创建飞机
     window.myplane = new window.planeFactory.plane(helper.scene);
     helper.animateQuee.push(function(){
            myplane.runAnimate();
