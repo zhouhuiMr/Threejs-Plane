@@ -177,8 +177,8 @@ window.planeFactory = new Object();
         this.wing_depth = wing_depth;
 
         this.height = wing_heightDifference;
-        this.radiusTop = 0.05;
-        this.radiusBottom = 0.05;
+        this.radiusTop = 0.1;
+        this.radiusBottom = 0.1;
         this.radialSegments = 4;
         this.thetaStart = 0;
         this.thetaLength = Math.PI * 2;
@@ -272,7 +272,7 @@ window.planeFactory = new Object();
             const geometries = [
                 geometry_1,geometry_2,geometry_3,geometry_4,
                 geometry_5,geometry_6,geometry_7,geometry_8,
-                shortGeometry_1,shortGeometry_3
+                //shortGeometry_1,shortGeometry_3
             ];
             this.bodyGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries,false);
 
@@ -304,6 +304,10 @@ window.planeFactory = new Object();
         this.thetaStart = 0;
         this.thetaLength = 2 * Math.PI;
 
+        this.height_center = 2;
+        this.height_front = this.radiusTop;
+        this.height_back = 8;
+
         this.bodyGeometry = null;
 
         this.bodyMaterial = null;
@@ -314,14 +318,11 @@ window.planeFactory = new Object();
         init : function(){
             //属性继承
             commonProperties.call(this);
-            const height_center = 2,
-                height_front = this.radiusTop,
-                height_back = 9;
             //飞机身体的中间部分
             const centerBofyOfPlane = new THREE.CylinderBufferGeometry(
                 this.radiusTop,
                 this.radiusBottom,
-                height_center,
+                this.height_center,
                 this.radialSegments,
                 1,
                 false,
@@ -329,12 +330,12 @@ window.planeFactory = new Object();
                 this.thetaLength
             );
             //飞机身体的前边部分
-            const frontBodyGeometry = buildFrontBodyOfPlane(height_front,this.radialSegments);
-            frontBodyGeometry.translate(0,height_center / 2 ,0);
+            const frontBodyGeometry = buildFrontBodyOfPlane(this.height_front,this.radialSegments);
+            frontBodyGeometry.translate(0,this.height_center / 2 ,0);
 
             //飞机身体的后边部分
-            const backBodyOfPlane = buildBackBodyOfPlane(height_back,this.radiusTop,this.radialSegments);
-            backBodyOfPlane.translate(0, -1 * (height_back + height_center ) / 2 - 2,0);
+            const backBodyOfPlane = buildBackBodyOfPlane(this.height_back,this.radiusTop,this.radialSegments);
+            backBodyOfPlane.translate(0, -1 * (this.height_back + this.height_center ) / 2 - 2,0);
 
             //图形合并
             const geometries = [frontBodyGeometry,centerBofyOfPlane,backBodyOfPlane];
@@ -497,11 +498,11 @@ window.planeFactory = new Object();
             this.bodyGeometry.rotateX(-1 * Math.PI / 2);
             this.bodyGeometry.rotateY(0);
             this.bodyGeometry.rotateZ(0);
-            const wing_front_object = new wing_front();
+            const planeBody = new plane_body();
             this.bodyGeometry.translate(
                 0,
-                2.9,
-                -10.5
+                2.8,
+                -1 * planeBody.height_back - planeBody.height_center + this.singleWingRadius - 0.8
             );
         },
         build : function(){
@@ -567,11 +568,11 @@ window.planeFactory = new Object();
             this.bodyGeometry.rotateX(0);
             this.bodyGeometry.rotateY(Math.PI / 2);
             this.bodyGeometry.rotateZ(0);
-            const wing_front_object = new wing_front();
+            const planeBody = new plane_body();
             this.bodyGeometry.translate(
-                0,
-                2.9,
-                -7.8
+                -0.1,
+                3,
+                -1 * planeBody.height_back - planeBody.height_center + this.maxWidth - 0.4
             );
         },
         build : function(){
@@ -947,6 +948,7 @@ window.planeFactory = new Object();
             this.body.add(this.body_upholder_3);
         },
         setSite : function(){
+            const planeBody = new plane_body();
             const rotate_z = Math.PI / 6;
             this.bodyGeometry_1.rotateY(Math.PI / 2);
             this.bodyGeometry_2.rotateY(Math.PI / 2);
@@ -969,7 +971,7 @@ window.planeFactory = new Object();
             this.bodyGeometry_upholder_1.translate(this.upholderInterval / 2, 0, move_z);
             this.bodyGeometry_2.translate(-this.upholderInterval / 2, 0, move_z);
             this.bodyGeometry_upholder_2.translate(-this.upholderInterval / 2, 0, move_z);
-            const move_hind_z = -11;
+            const move_hind_z = -1 * planeBody.height_center - planeBody.height_back + 0.2;
             const move_hind_y = 2;
             this.bodyGeometry_3.translate(0.2,move_hind_y,move_hind_z);
             this.bodyGeometry_upholder_3.translate(0,move_hind_y+0.2,move_hind_z);
