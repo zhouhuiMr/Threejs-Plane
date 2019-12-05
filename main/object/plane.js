@@ -84,7 +84,7 @@ window.planeFactory = new Object();
 
         this.bodyMaterial = null;
 
-        this.materialColor = 0xbdbdbc;
+        this.materialColor = 0x8B4513;
         this.distance = 4;
         this.distance_angle = Math.PI / 3;
 
@@ -171,7 +171,7 @@ window.planeFactory = new Object();
         this.bodyGeometry = null;
         this.bodyMaterial = null;
 
-        this.materialColor = 0xbdbdbc;
+        this.materialColor = 0x8B4513;
 
         this.wing_width = wing_width;
         this.wing_depth = wing_depth;
@@ -228,25 +228,25 @@ window.planeFactory = new Object();
             geometry_5.rotateZ(Math.PI / 2 - angle);
             geometry_5.translate(
                 -this.wing_width / 2 + upholderExtent * Math.sin(angle) / 2,
-                this.height / 2,
+                this.height / 2 - 0.1,
                 -this.wing_depth / 2 + 0.5
             );
             geometry_6.rotateZ(Math.PI / 2 - angle);
             geometry_6.translate(
                 -this.wing_width / 2 + upholderExtent * Math.sin(angle) / 2,
-                this.height / 2,
+                this.height / 2 - 0.1,
                 this.wing_depth / 2 - 0.5
             );
             geometry_7.rotateZ(-1 * (Math.PI / 2 - angle));
             geometry_7.translate(
                 this.wing_width / 2 - upholderExtent * Math.sin(angle) / 2,
-                this.height / 2,
+                this.height / 2 - 0.1,
                 -this.wing_depth / 2 + 0.5
             );
             geometry_8.rotateZ(-1 * (Math.PI / 2 - angle));
             geometry_8.translate(
                 this.wing_width / 2 - upholderExtent * Math.sin(angle) / 2,
-                this.height / 2,
+                this.height / 2 - 0.1,
                 this.wing_depth / 2 -0.5
             );
 
@@ -311,7 +311,7 @@ window.planeFactory = new Object();
         this.bodyGeometry = null;
 
         this.bodyMaterial = null;
-        this.materialColor = 0xbdbdbc;
+        this.materialColor = 0x8B4513;
         this.init();
     };
     plane_body.prototype = {
@@ -435,7 +435,7 @@ window.planeFactory = new Object();
         this.bodyMaterial = null;
         this.extrudeSettings = null;
 
-        this.materialColor = 0xbdbdbc;
+        this.materialColor = 0x8B4513;
 
         this.init();
     };
@@ -527,7 +527,7 @@ window.planeFactory = new Object();
         this.bodyMaterial = null;
         this.extrudeSettings = null;
 
-        this.materialColor = 0xbdbdbc;
+        this.materialColor = 0x8B4513;
 
         this.init();
     };
@@ -600,7 +600,7 @@ window.planeFactory = new Object();
         this.bodyMaterial = null;
         this.extrudeSettings = null;
 
-        this.materialColor = 0xbdbdbc;
+        this.materialColor = 0x8B4513;
 
         this.init();
     };
@@ -670,7 +670,7 @@ window.planeFactory = new Object();
 
         this.bodyMaterial = null;
 
-        this.materialColor = 0xbdbdbc;
+        this.materialColor = 0x8B4513;
 
         this.points = [];
 
@@ -735,7 +735,7 @@ window.planeFactory = new Object();
         this.bodyShape = new THREE.Shape();
         this.bodyMaterial = null;
         this.extrudeSettings = null;
-        this.materialColor = 0xbdbdbc;
+        this.materialColor = 0x8B4513;
 
         this.init();
     };
@@ -761,35 +761,61 @@ window.planeFactory = new Object();
                 wireframe : this.isUseWireframe,
             } );
 
-            const siteX_1 = this.radius * Math.cos(this.fixAngle) - 0.2,
-                siteY_1 = this.radius * Math.sin(this.fixAngle),
-                siteX_2 = -1 * siteX_1,
-                siteY_2 = siteY_1;
-            const minAngle = this.fixAngle,
-                   maxAngle = Math.PI - this.fixAngle;
-
-            const angel = Math.PI * 2 / this.segments;
-            for(let i = 0; i <= this.segments; i++){
-                let x = Math.cos(angel * i) * this.radius,
-                    y = Math.sin(angel * i) * this.radius;
-                if(y >= siteY_1){
-                    this.bodyShape.lineTo(siteX_1,siteY_1);
-                    this.bodyShape.lineTo(siteX_2,siteY_2);
-                    continue
-                }
-                this.bodyShape.lineTo(x,y);
-            }
-            this.bodyGeometry = new THREE.ExtrudeBufferGeometry( this.bodyShape, this.extrudeSettings );
+            // const siteX_1 = this.radius * Math.cos(this.fixAngle) - 0.2,
+            //     siteY_1 = this.radius * Math.sin(this.fixAngle),
+            //     siteX_2 = -1 * siteX_1,
+            //     siteY_2 = siteY_1;
+            // const minAngle = this.fixAngle,
+            //        maxAngle = Math.PI - this.fixAngle;
+            //
+            // const angel = Math.PI * 2 / this.segments;
+            // for(let i = 0; i <= this.segments; i++){
+            //     let x = Math.cos(angel * i) * this.radius,
+            //         y = Math.sin(angel * i) * this.radius;
+            //     if(y >= siteY_1){
+            //         this.bodyShape.lineTo(siteX_1,siteY_1);
+            //         this.bodyShape.lineTo(siteX_2,siteY_2);
+            //         continue
+            //     }
+            //     this.bodyShape.lineTo(x,y);
+            // }
+            // this.bodyGeometry = new THREE.ExtrudeBufferGeometry( this.bodyShape, this.extrudeSettings );
+            this.bodyGeometry = new THREE.CylinderBufferGeometry(
+                this.radius,
+                this.radius,
+                this.depth,
+                this.segments,
+                1,
+                true,
+                0,
+                Math.PI * 2
+            );
             this.setSite();
+
+            const vertex = new THREE.Vector3();
+            const bodyGeometry_Position = this.bodyGeometry.attributes.position;
+            const positionArray = new Array();
+            for(i = 0;i<bodyGeometry_Position.count;i++){
+                vertex.fromBufferAttribute( bodyGeometry_Position, i );
+                if(vertex.y > 4){
+                    vertex.y = 3.6;
+                }
+                positionArray.push(vertex.x);
+                positionArray.push(vertex.y);
+                positionArray.push(vertex.z);
+            }
+            this.bodyGeometry.attributes.position.array = new Float32Array(positionArray);
+
             this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
         },
         setSite : function(){
             const wing_front_object = new wing_front();
             const plane_body_object = new plane_body();
+            this.bodyGeometry.rotateX(-1 * Math.PI / 2);
             this.bodyGeometry.translate(
                 0,
                 plane_body_object.radiusTop - 0.4,
-                - 2.2
+                - 1.2
             );
         },
         build : function(){
