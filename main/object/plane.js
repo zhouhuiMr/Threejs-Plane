@@ -11,8 +11,10 @@ window.planeFactory = new Object();
 
     let commonProperties = function(){
         this.isUseWireframe = false; //是否显示线条，true显示为线条
-        this.isCastShadow = false;
-        this.isReceiveShadow = false;
+        this.isCastShadow = true;
+        this.isReceiveShadow = true;
+        this.reflectivity = 1.0;
+        this.isUseFlatShading = true;
     };
 
     /**
@@ -32,6 +34,10 @@ window.planeFactory = new Object();
         this.propeller_mesh = new propeller();// 飞机的螺旋桨
         this.propellerUpholder_mesh = new propellerUpholder();// 飞机的螺旋桨的支撑物
         this.front_wheel_mesh = new front_wheel();// 飞机的轮胎
+
+        this.postionX = 0;
+        this.postionY = 0;
+        this.postionZ = 0;
 
         this.init();
     };
@@ -59,8 +65,19 @@ window.planeFactory = new Object();
             this.body.add(this.propellerUpholder_mesh.build());
 
             this.body.add(this.front_wheel_mesh.build());
+            //this.body.scale.set(0.7,0.7,0.7);
 
             this.scene.add(this.body);
+        },
+        setSite : function(x,y,z){
+            this.postionX = x;
+            this.postionY = y;
+            this.postionZ = z;
+            this.body.translateX(this.postionX);
+            this.body.translateY(this.postionY);
+            this.body.translateZ(this.postionZ);
+            this.body.rotateY(Math.PI);
+            //this.body.rotateZ(Math.PI / 6);
         },
         runAnimate : function(){
             this.propeller_mesh.body.rotateZ(0.8);
@@ -84,7 +101,7 @@ window.planeFactory = new Object();
 
         this.bodyMaterial = null;
 
-        this.materialColor = 0x8B4513;
+        this.materialColor = 0x700b05;
         this.distance = 4;
         this.distance_angle = Math.PI / 3;
 
@@ -108,11 +125,13 @@ window.planeFactory = new Object();
                 bevelOffset: 0
             };
             //材质
-            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+            this.bodyMaterial = new THREE.MeshLambertMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
-                wireframe : this.isUseWireframe,
+                flatShading : this.isUseFlatShading,
+                wireframe : this.isUseWireframe
             } );
+            this.bodyMaterial.reflectivity = this.reflectivity;
             //前端的上部机翼
             this.bodyTopShape.moveTo(-this.width / 2 , -this.height / 2);
             this.bodyTopShape.lineTo((-this.width + this.distance) / 2, -this.height / 2);
@@ -143,6 +162,8 @@ window.planeFactory = new Object();
             this.bodyGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries,false);
 
             this.body = new THREE.Mesh( this.bodyGeometry, this.bodyMaterial );
+            this.body.castShadow = this.isCastShadow;
+            this.body.receiveShadow = this.isReceiveShadow;
         },
         setSite : function(){
             //设置一下顶部机翼的位置
@@ -171,7 +192,7 @@ window.planeFactory = new Object();
         this.bodyGeometry = null;
         this.bodyMaterial = null;
 
-        this.materialColor = 0x8B4513;
+        this.materialColor = 0x700b05;
 
         this.wing_width = wing_width;
         this.wing_depth = wing_depth;
@@ -276,12 +297,16 @@ window.planeFactory = new Object();
             ];
             this.bodyGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries,false);
 
-            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+            this.bodyMaterial = new THREE.MeshLambertMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
+                flatShading : this.isUseFlatShading,
                 wireframe : this.isUseWireframe,
             });
+            this.bodyMaterial.reflectivity = this.reflectivity;
             this.body = new THREE.Mesh( this.bodyGeometry, this.bodyMaterial ) ;
+            this.body.castShadow = this.isCastShadow;
+            this.body.receiveShadow = this.isReceiveShadow;
         },
         build : function(){
             return this.body;
@@ -311,7 +336,7 @@ window.planeFactory = new Object();
         this.bodyGeometry = null;
 
         this.bodyMaterial = null;
-        this.materialColor = 0x8B4513;
+        this.materialColor = 0x700b05;
         this.init();
     };
     plane_body.prototype = {
@@ -342,13 +367,17 @@ window.planeFactory = new Object();
             //var geometries = [siteBodyGeometry];
             this.bodyGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries,false);
 
-            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+            this.bodyMaterial = new THREE.MeshLambertMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
-                wireframe : this.isUseWireframe,
+                flatShading : this.isUseFlatShading,
+                wireframe : this.isUseWireframe
             } );
+            this.bodyMaterial.reflectivity = this.reflectivity;
             this.setSite();
             this.body = new THREE.Mesh( this.bodyGeometry, this.bodyMaterial ) ;
+            this.body.castShadow = this.isCastShadow;
+            this.body.receiveShadow = this.isReceiveShadow;
         },
         setSite : function(){
             const wing = new wing_front();
@@ -435,7 +464,7 @@ window.planeFactory = new Object();
         this.bodyMaterial = null;
         this.extrudeSettings = null;
 
-        this.materialColor = 0x8B4513;
+        this.materialColor = 0x700b05;
 
         this.init();
     };
@@ -454,11 +483,13 @@ window.planeFactory = new Object();
                 bevelOffset: 0
             };
             //材质
-            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+            this.bodyMaterial = new THREE.MeshLambertMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
+                flatShading : this.isUseFlatShading,
                 wireframe : this.isUseWireframe,
             } );
+            this.bodyMaterial.reflectivity = this.reflectivity;
 
             this.bodyShape.moveTo(0,0);
             this.bodyShape.absarc(
@@ -486,13 +517,15 @@ window.planeFactory = new Object();
             this.bodyShape.bezierCurveTo(
                 -1 * this.singleWingRadius * 2 + 0.2 , -0.3,
                 -1 * this.singleWingRadius * 2 + 0.1 , -0.2,
-                -1 * this.singleWingRadius * 2 , -0.1,
+                -1 * this.singleWingRadius * 2 , -0.1
             );
             this.bodyGeometry = new THREE.ExtrudeBufferGeometry( this.bodyShape, this.extrudeSettings );
 
             this.setSite();
 
             this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
+            this.body.castShadow = this.isCastShadow;
+            this.body.receiveShadow = this.isReceiveShadow;
         },
         setSite : function(){
             this.bodyGeometry.rotateX(-1 * Math.PI / 2);
@@ -527,7 +560,7 @@ window.planeFactory = new Object();
         this.bodyMaterial = null;
         this.extrudeSettings = null;
 
-        this.materialColor = 0x8B4513;
+        this.materialColor = 0x700b05;
 
         this.init();
     };
@@ -546,11 +579,13 @@ window.planeFactory = new Object();
                 bevelOffset: 0
             };
             //材质
-            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+            this.bodyMaterial = new THREE.MeshLambertMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
+                flatShading : this.isUseFlatShading,
                 wireframe : this.isUseWireframe,
             } );
+            this.bodyMaterial.reflectivity = this.reflectivity;
             this.bodyShape.moveTo(0,0);
             this.bodyShape.lineTo(this.maxWidth - 0.7,this.maxHeight - 0.5);
             this.bodyShape.bezierCurveTo(
@@ -563,6 +598,8 @@ window.planeFactory = new Object();
             this.bodyGeometry = new THREE.ExtrudeBufferGeometry( this.bodyShape, this.extrudeSettings );
             this.setSite();
             this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
+            this.body.castShadow = this.isCastShadow;
+            this.body.receiveShadow = this.isReceiveShadow;
         },
         setSite : function(){
             this.bodyGeometry.rotateX(0);
@@ -600,7 +637,7 @@ window.planeFactory = new Object();
         this.bodyMaterial = null;
         this.extrudeSettings = null;
 
-        this.materialColor = 0x8B4513;
+        this.materialColor = 0x700b05;
 
         this.init();
     };
@@ -622,8 +659,10 @@ window.planeFactory = new Object();
             this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
+                flatShading : this.isUseFlatShading,
                 wireframe : this.isUseWireframe,
             } );
+            this.bodyMaterial.reflectivity = this.reflectivity;
             this.bodyShape.moveTo(0,0);
             this.bodyShape.bezierCurveTo(
                 this.cp1x,this.cp1y,
@@ -644,6 +683,8 @@ window.planeFactory = new Object();
             this.bodyGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries,false);
             this.setSite();
             this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
+            this.body.castShadow = this.isCastShadow;
+            this.body.receiveShadow = this.isReceiveShadow;
 
             const plane_body_object = new plane_body();
             this.body.translateY(plane_body_object.radiusTop - 0.3);
@@ -670,7 +711,7 @@ window.planeFactory = new Object();
 
         this.bodyMaterial = null;
 
-        this.materialColor = 0x8B4513;
+        this.materialColor = 0x700b05;
 
         this.points = [];
 
@@ -681,11 +722,13 @@ window.planeFactory = new Object();
             //属性继承
             commonProperties.call(this);
             //材质
-            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+            this.bodyMaterial = new THREE.MeshLambertMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
+                flatShading : this.isUseFlatShading,
                 wireframe : this.isUseWireframe,
             } );
+            this.bodyMaterial.reflectivity = this.reflectivity;
 
             this.points.push( new THREE.Vector3(0, 0.4, 0));
             //0°到45°
@@ -697,6 +740,8 @@ window.planeFactory = new Object();
             this.bodyGeometry = new THREE.LatheBufferGeometry( this.points,8,0,2 * Math.PI);
             this.setSite();
             this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
+            this.body.castShadow = this.isCastShadow;
+            this.body.receiveShadow = this.isReceiveShadow;
         },
         setSite : function(){
             this.bodyGeometry.rotateX(-1 * Math.PI / 2);
@@ -735,7 +780,7 @@ window.planeFactory = new Object();
         this.bodyShape = new THREE.Shape();
         this.bodyMaterial = null;
         this.extrudeSettings = null;
-        this.materialColor = 0x8B4513;
+        this.materialColor = 0x700b05;
 
         this.init();
     };
@@ -755,11 +800,13 @@ window.planeFactory = new Object();
             };
 
             //材质
-            this.bodyMaterial = new THREE.MeshPhysicalMaterial( {
+            this.bodyMaterial = new THREE.MeshLambertMaterial( {
                 color: this.materialColor,
                 side : THREE.FrontSide,
+                flatShading : this.isUseFlatShading,
                 wireframe : this.isUseWireframe,
             } );
+            this.bodyMaterial.reflectivity = this.reflectivity;
 
             // const siteX_1 = this.radius * Math.cos(this.fixAngle) - 0.2,
             //     siteY_1 = this.radius * Math.sin(this.fixAngle),
@@ -807,6 +854,8 @@ window.planeFactory = new Object();
             this.bodyGeometry.attributes.position.array = new Float32Array(positionArray);
 
             this.body = new THREE.Mesh(this.bodyGeometry , this.bodyMaterial);
+            this.body.castShadow = this.isCastShadow;
+            this.body.receiveShadow = this.isReceiveShadow;
         },
         setSite : function(){
             const wing_front_object = new wing_front();
@@ -864,7 +913,7 @@ window.planeFactory = new Object();
         this.extrudeSettings_wheel = null;
         this.extrudeSettings_upholder = null;
         this.materialColor_wheel = 0x000000;
-        this.materialColor_upholder = 0xd1d1d1;
+        this.materialColor_upholder = 0x4c4542;
 
         this.init();
     };
@@ -896,11 +945,13 @@ window.planeFactory = new Object();
             this.bodyMaterial_wheel = new THREE.MeshLambertMaterial( {
                 color: this.materialColor_wheel,
                 side : THREE.FrontSide,
+                flatShading : this.isUseFlatShading,
                 wireframe : this.isUseWireframe,
             } );
-            this.bodyMaterial_upholder = new THREE.MeshPhysicalMaterial( {
+            this.bodyMaterial_upholder = new THREE.MeshLambertMaterial( {
                 color: this.materialColor_upholder,
                 side : THREE.FrontSide,
+                flatShading : this.isUseFlatShading,
                 wireframe : this.isUseWireframe,
             } );
 
@@ -961,11 +1012,29 @@ window.planeFactory = new Object();
 
             this.setSite();
             this.body_1 = new THREE.Mesh(this.bodyGeometry_1 , this.bodyMaterial_wheel);
+            this.body_1.castShadow = this.isCastShadow;
+            this.body_1.receiveShadow = this.isReceiveShadow;
+
             this.body_2 = new THREE.Mesh(this.bodyGeometry_2 , this.bodyMaterial_wheel);
+            this.body_2.castShadow = this.isCastShadow;
+            this.body_2.receiveShadow = this.isReceiveShadow;
+
             this.body_3 = new THREE.Mesh(this.bodyGeometry_3 , this.bodyMaterial_wheel);
+            this.body_3.castShadow = this.isCastShadow;
+            this.body_3.receiveShadow = this.isReceiveShadow;
+
             this.body_upholder_1 = new THREE.Mesh(this.bodyGeometry_upholder_1 , this.bodyMaterial_upholder);
+            this.body_upholder_1.castShadow = this.isCastShadow;
+            this.body_upholder_1.receiveShadow = this.isReceiveShadow;
+
             this.body_upholder_2 = new THREE.Mesh(this.bodyGeometry_upholder_2 , this.bodyMaterial_upholder);
+            this.body_upholder_2.castShadow = this.isCastShadow;
+            this.body_upholder_2.receiveShadow = this.isReceiveShadow;
+
             this.body_upholder_3 = new THREE.Mesh(this.bodyGeometry_upholder_3 , this.bodyMaterial_upholder);
+            this.body_upholder_3.castShadow = this.isCastShadow;
+            this.body_upholder_3.receiveShadow = this.isReceiveShadow;
+
             this.body.add(this.body_1);
             this.body.add(this.body_2);
             this.body.add(this.body_3);
